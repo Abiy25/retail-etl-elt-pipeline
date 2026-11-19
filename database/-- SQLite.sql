@@ -13,3 +13,4 @@ ORDER BY current_stock DESC;
 
 SELECT *
 FROM rejected_inventory_movements;
+

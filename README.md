@@ -1,32 +1,65 @@
-
 # Retail ETL & ELT Pipeline
 
 ## Project Overview
 
-This project demonstrates two fundamental data engineering approaches: ETL (Extract, Transform, Load) and ELT (Extract, Load, Transform).
+This is a data engineering project that demonstrates two approaches to data processing: ETL (Extract, Transform, Load) and ELT (Extract, Load, Transform).
 
-The project uses a retail sales dataset to demonstrate data extraction, data cleaning, validation, transformation, database loading, and SQL-based analysis.
+The project uses Python, SQLite, and SQL to process retail sales and inventory data from CSV files.
 
-## Technologies
+## Technologies Used
 
 - Python
 - SQLite
 - SQL
 - CSV
-- Git and GitHub
-- Pytest
 
 ## Project Objectives
 
 1. Build an ETL pipeline using Python.
 2. Build an ELT pipeline using Python and SQL.
-3. Implement data quality checks.
-4. Store processed data in SQLite.
-5. Perform analytical queries using SQL.
-6. Compare ETL and ELT approaches.
+3. Clean and validate raw data.
+4. Store data in SQLite databases.
+5. Generate simple summaries using SQL.
+6. Understand the differences between ETL and ELT.
 
-## Project Status
+## Project Structure
 
-Project initialization and dataset preparation.
+- `data/` – Contains the CSV datasets.
+- `etl/` – Contains the Python files for the ETL pipeline.
+- `elt/` – Contains the Python and SQL files for the ELT pipeline.
+- `database/` – Stores the SQLite databases.
 
-The pipelines are currently under development.
+## How to Run
+
+Run the ETL pipeline:
+
+```bash
+python -m etl.run_loading
+```
+
+Run the ELT pipeline:
+
+```bash
+python -m elt.run_elt
+```
+
+## Results
+
+**ETL Pipeline**
+- Extracted: 36 records
+- Valid records: 31
+- Rejected records: 5
+- Loaded into database: 31 records
+
+**ELT Pipeline**
+- Extracted: 19 records
+- Raw records loaded: 19
+- Clean records: 12
+- Rejected records: 7
+- Inventory summary rows: 8
+
+## Author
+
+Abiy Abebe
+
+GitHub: [Abiy25](https://github.com/Abiy25)

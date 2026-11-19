@@ -1,7 +1,8 @@
+
+-- Remove previously generated tables.
+
 DROP TABLE IF EXISTS rejected_inventory_movements;
-
 DROP TABLE IF EXISTS clean_inventory_movements;
-
 DROP TABLE IF EXISTS inventory_summary;
 
 
@@ -11,12 +12,20 @@ CREATE TABLE rejected_inventory_movements AS
 
 SELECT
     *,
+
     RTRIM(
         CASE
-            WHEN movement_id IN (
-                SELECT movement_id
+            WHEN TRIM(COALESCE(movement_id, '')) = ''
+            THEN 'Missing movement ID; '
+            ELSE ''
+        END ||
+
+        CASE
+            WHEN TRIM(COALESCE(movement_id, '')) IN (
+                SELECT TRIM(movement_id)
                 FROM raw_inventory_movements
-                GROUP BY movement_id
+                WHERE TRIM(COALESCE(movement_id, '')) != ''
+                GROUP BY TRIM(movement_id)
                 HAVING COUNT(*) > 1
             )
             THEN 'Duplicate movement ID; '
@@ -53,23 +62,34 @@ SELECT
             THEN 'Invalid unit cost; '
             ELSE ''
         END,
+
         '; '
+
     ) AS rejection_reason
 
 FROM raw_inventory_movements
 
 WHERE
-    movement_id IN (
-        SELECT movement_id
+
+    TRIM(COALESCE(movement_id, '')) = ''
+
+    OR TRIM(COALESCE(movement_id, '')) IN (
+        SELECT TRIM(movement_id)
         FROM raw_inventory_movements
-        GROUP BY movement_id
+        WHERE TRIM(COALESCE(movement_id, '')) != ''
+        GROUP BY TRIM(movement_id)
         HAVING COUNT(*) > 1
     )
+
     OR TRIM(COALESCE(product_id, '')) = ''
+
     OR date(movement_date) IS NULL
     OR LENGTH(movement_date) != 10
+
     OR UPPER(TRIM(movement_type)) NOT IN ('IN', 'OUT')
+
     OR CAST(quantity AS INTEGER) <= 0
+
     OR CAST(unit_cost AS REAL) <= 0;
 
 
@@ -104,17 +124,26 @@ SELECT
 FROM raw_inventory_movements
 
 WHERE
-    movement_id NOT IN (
-        SELECT movement_id
+
+    TRIM(COALESCE(movement_id, '')) != ''
+
+    AND TRIM(movement_id) NOT IN (
+        SELECT TRIM(movement_id)
         FROM raw_inventory_movements
-        GROUP BY movement_id
+        WHERE TRIM(COALESCE(movement_id, '')) != ''
+        GROUP BY TRIM(movement_id)
         HAVING COUNT(*) > 1
     )
+
     AND TRIM(COALESCE(product_id, '')) != ''
+
     AND date(movement_date) IS NOT NULL
     AND LENGTH(movement_date) = 10
+
     AND UPPER(TRIM(movement_type)) IN ('IN', 'OUT')
+
     AND CAST(quantity AS INTEGER) > 0
+
     AND CAST(unit_cost AS REAL) > 0;
 
 
@@ -132,7 +161,7 @@ SELECT
 
     SUM(
         signed_quantity * unit_cost
-    ) AS net_inventory_value
+    ) AS net_movement_value
 
 FROM clean_inventory_movements
 
